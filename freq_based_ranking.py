@@ -37,7 +37,7 @@ def open_file(file_path):
     os.startfile(file_path)
 
 # Specify the folder paths where your PDF documents are located
-folder_paths = [r"C:\Users\RAMKUMAR K\Desktop\S5 Mini Project\meddocs"]
+folder_paths = [r"C:\Users\RAMKUMAR K\Desktop\S5-MiniProject\test"]
 
 # The keyword to search for in the PDF files
 keyword = "virus"
