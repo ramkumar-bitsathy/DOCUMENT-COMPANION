@@ -1,3 +1,7 @@
 #ignoring test files
 /test/
 /doco/
+/testreduced/
+nertrain.py
+traindatagen.py
+/__pycache__/

@@ -24,18 +24,21 @@ def search_files(folder_paths, keyword):
                                 if page_text and keyword.lower() in page_text.lower():
                                     frequency += page_text.lower().count(keyword.lower())
                                     results.append((file_path, file, page_num + 1))
-                            ranking[file] = frequency
+                            ranking[(file_path, file, page_num + 1)] = frequency
                     except Exception as e:
                         print(f"Error reading {file_path}: {e}")
 
         if results:
             search_results[folder_path] = results
-
+    print(search_results)
     return ranking
-
+"""
 def open_file(file_path):
     os.startfile(file_path)
 
+
+
+r"""
 # Specify the folder paths where your PDF documents are located
 folder_paths = [r"C:\Users\RAMKUMAR K\Desktop\S5-MiniProject\test"]
 
@@ -56,7 +59,7 @@ if values:
     print(f"\nRanked Results:\n{ranked_results}")
 else:
     print("No results found.")
-
+"""
 # Uncomment below to print details about found results
 """
 if len(search_results) > 0:
