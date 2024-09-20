@@ -32,7 +32,7 @@ def search_files(folder_paths, keyword):
             search_results[folder_path] = results
     print(search_results)
     return ranking
-"""
+
 def open_file(file_path):
     os.startfile(file_path)
 
