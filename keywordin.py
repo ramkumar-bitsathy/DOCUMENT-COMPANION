@@ -9,6 +9,6 @@ def extract_text_from_file(file_path):
             text += page.extractText()
     return text
 
-file_path = r"C:\Users\RAMKUMAR K\Downloads\ChoiceOrder_297695 (4).pdf"
+file_path = r"C:\Users\RAMKUMAR K\Desktop\S5-MiniProject\test\jmir-2006-2-e9.pdf"
 text = extract_text_from_file(file_path)
 print(text)

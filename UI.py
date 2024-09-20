@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import numpy as np
 import freq_based_ranking
+import summariser
 import webbrowser  # Import webbrowser to open the file
 
 st.title("PDF Keyword Search Tool")
@@ -75,7 +76,7 @@ if st.session_state["search_results"]:
                 if st.button("Summarize", key=f"summarize_{file_path[1]}"):
                     # Call a hypothetical summarize function (replace with actual logic)
                     st.write(f"Summarizing content from {file_path[1]}...")
-                    summary = freq_based_ranking.summarize_file(file_path[0])
+                    summary = summariser.summarize_file(file_path[0])
                     st.write(summary)
 
             # Add "Tap to Hear" button
