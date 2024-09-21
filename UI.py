@@ -70,6 +70,7 @@ if st.session_state["search_results"]:
                         st.error(f"File {pdf_file_path} not found.")
 
             # Add "Summarize" button
+            
             with col_button2:
                 if st.button("Summarize", key=f"summarize_{file_path[1]}"):
                     # Call a hypothetical summarize function (replace with actual logic)
