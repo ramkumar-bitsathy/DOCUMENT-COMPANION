@@ -1,5 +1,7 @@
 import streamlit as st
 import freq_based_ranking
+import summariser
+import webbrowser  # Import webbrowser to open the file
 import webbrowser
 import os
 
@@ -54,7 +56,9 @@ if st.session_state["search_results"]:
     ranked_results = st.session_state["search_results"]
 
     # Display each result with a button to open the corresponding PDF
+    count = 0
     for file_path, score in ranked_results.items():
+        count+=1
         if score > 0:
             # Create two columns, one for the text and one for the progress bar
             col1, col2 = st.columns([3, 1])
@@ -73,7 +77,7 @@ if st.session_state["search_results"]:
 
             # Open File button
             with col_button1:
-                if st.button(f"Open File", key=f"open_{os.path.basename(file_path)}"):
+                if st.button(f"Open File", key=f"open_{count}"):
                     if os.path.exists(file_path):
                         webbrowser.open('file://' + os.path.realpath(file_path))
                     else:
@@ -81,15 +85,21 @@ if st.session_state["search_results"]:
 
             # Summarize button (placeholder for your summarizer function)
             with col_button2:
-                if st.button("Summarize", key=f"summarize_{os.path.basename(file_path)}"):
-                    #st.write(f"Summarizing content from {os.path.basename(file_path)}...")
-                    st.write(st.session_state["pdf_texts"][file_path])
-                    # summary = summariser.summarize_file(file_path)  # Implement your summarizer here
-                    # st.write(summary)
+                if st.button("Summarize", key=f"summarize_{count}"):
+                    # Call a hypothetical summarize function (replace with actual logic)
+                    #st.write(f"Summarizing content from {file_path[1]}...")
+
+                    #st.write(st.session_state["pdf_texts"][file_path])
+                    summary = summariser.summarize_file(st.session_state["pdf_texts"][file_path])
+                    st.write(summary)
+    
 
             # Tap to Hear button (placeholder for your text-to-speech function)
             with col_button3:
-                if st.button("Tap to Hear", key=f"hear_{os.path.basename(file_path)}"):
-                    st.write(f"Playing audio for {os.path.basename(file_path)}...")
-                    # freq_based_ranking.text_to_speech(file_path)  # Implement your text-to-speech function
+                if st.button("Tap to Hear", key=f"hear_{count}"):
+                    # Call a hypothetical text-to-speech function (replace with actual logic)
+                    st.write(f"Playing audio for {file_path[1]}...")
+                    #freq_based_ranking.text_to_speech(file_path[0])
+
+        
             st.divider()
