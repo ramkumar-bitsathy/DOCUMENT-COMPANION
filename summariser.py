@@ -5,10 +5,10 @@ def summarize_file(body):
     
     if body:
         st.subheader("Original Text")
-        st.write(body)  
+        #st.write(body)  
 
-        word_count_input = len(body.split())
-        st.write(f"Word Count (Input): {word_count_input}")
+        #word_count_input = len(body.split())
+        #st.write(f"Word Count (Input): {word_count_input}")
         summary = model(body, ratio=0.4)
         return summary
     
