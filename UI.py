@@ -1,86 +1,95 @@
 import streamlit as st
-import os
-import numpy as np
 import freq_based_ranking
-#import summariser
-import webbrowser  # Import webbrowser to open the file
+import webbrowser
+import os
 
 st.title("PDF Keyword Search Tool")
 
-# Text input for folder path and keyword
-folder_path = st.text_input("Enter the folder path containing PDF documents:")
-keyword = st.text_input("Enter the keyword to search for:")
+# Step 1: Text Extraction
 
-# Initialize session state to store search results
+# Text input for folder path
+folder_path = st.text_input("Enter the folder path containing PDF documents:")
+
+# Initialize session state to store extracted texts and search results
+if "pdf_texts" not in st.session_state:
+    st.session_state["pdf_texts"] = None
 if "search_results" not in st.session_state:
     st.session_state["search_results"] = None
 
-# Submit button to trigger search
-if st.button('Submit'):
-    with st.spinner("Fetching in process"):
-        if folder_path and keyword:
-            folder_paths = [folder_path]
+# Button to process and extract text from PDFs
+if st.button('Process PDFs'):
+    if folder_path:
+        folder_paths = [folder_path]
+        with st.spinner("Extracting text from PDFs..."):
+            # Extract the text from PDFs
+            pdf_texts = freq_based_ranking.extract_pdf_text(folder_paths)
+            st.session_state["pdf_texts"] = pdf_texts
+            st.success("Text extraction completed!")
+    else:
+        st.error("Please enter a valid folder path.")
 
-            # Search for files using your custom function
-            search_results = freq_based_ranking.search_files(folder_paths, keyword)
-            st.session_state["search_results"] = search_results  # Save results in session state
+# Step 2: Keyword Search
+
+# Text input for keyword
+keyword = st.text_input("Enter the keyword to search for:")
+
+# Submit button to trigger keyword search
+if st.button('Submit'):
+    if st.session_state["pdf_texts"] and keyword:
+        with st.spinner("Searching for keyword..."):
+            search_results = freq_based_ranking.search_in_pdf_texts(st.session_state["pdf_texts"], keyword)
+            st.session_state["search_results"] = search_results
 
             if search_results:
                 st.success("Search completed!")
             else:
                 st.warning("No results found.")
+    else:
+        st.error("Please process PDFs and enter a keyword before searching.")
 
-        else:
-            st.error("Please enter both folder path and keyword.")
+# Step 3: Display Results
 
 # If we have search results, display them
 if st.session_state["search_results"]:
-    search_results = st.session_state["search_results"]
-    keys = list(search_results.keys())
-    values = list(search_results.values())
-
-    # Sort the results based on the frequency of the keyword
-    sorted_value_index = np.argsort(values)
-    ranked_results = {keys[i]: values[i] for i in sorted_value_index[::-1]}
+    ranked_results = st.session_state["search_results"]
 
     # Display each result with a button to open the corresponding PDF
     for file_path, score in ranked_results.items():
         if score > 0:
-            # Create two columns, one for the text and one for the half-sized progress bar
-            col1, col2 = st.columns([3, 1])  # Adjust column widths as needed
+            # Create two columns, one for the text and one for the progress bar
+            col1, col2 = st.columns([3, 1])
 
             with col1:
                 # Show the file name and occurrence count
-                st.write(f"**{file_path[1]}** occurrence: {score}")
+                st.write(f"**{os.path.basename(file_path)}** - Occurrences: {score}")
             
             with col2:
-                # Display a smaller progress bar for keyword occurrence
-                st.progress(min(100, int((score / max(ranked_results.values())) * 100)))
+                # Display a progress bar for keyword occurrence
+                max_score = max(ranked_results.values())
+                st.progress(min(100, int((score / max_score) * 100)))
 
-            # Create a row of 3 buttons: Open File, Summarize, and Tap to Hear
+            # Create buttons: Open File, Summarize, Tap to Hear
             col_button1, col_button2, col_button3 = st.columns([1, 1, 1])
 
-            # Add "Open File" button with a unique key
+            # Open File button
             with col_button1:
-                if st.button(f"Open File", key=f"open_{file_path[1]}"):
-                    pdf_file_path = file_path[0]  # Get the actual file path
-                    if os.path.exists(pdf_file_path):
-                        # Open the file using the default PDF viewer
-                        webbrowser.open('file://' + os.path.realpath(pdf_file_path))
+                if st.button(f"Open File", key=f"open_{os.path.basename(file_path)}"):
+                    if os.path.exists(file_path):
+                        webbrowser.open('file://' + os.path.realpath(file_path))
                     else:
-                        st.error(f"File {pdf_file_path} not found.")
+                        st.error(f"File {file_path} not found.")
 
-            # Add "Summarize" button 
+            # Summarize button (placeholder for your summarizer function)
             with col_button2:
-                if st.button("Summarize", key=f"summarize_{file_path[1]}"):
-                    # Call a hypothetical summarize function (replace with actual logic)
-                    st.write(f"Summarizing content from {file_path[1]}...")
-                    #summary = freq_based_ranking.summarize_file(file_path[0])
-                    #st.write(summary)
+                if st.button("Summarize", key=f"summarize_{os.path.basename(file_path)}"):
+                    #st.write(f"Summarizing content from {os.path.basename(file_path)}...")
+                    st.write(st.session_state["pdf_texts"][file_path])
+                    # summary = summariser.summarize_file(file_path)  # Implement your summarizer here
+                    # st.write(summary)
 
-            # Add "Tap to Hear" button
+            # Tap to Hear button (placeholder for your text-to-speech function)
             with col_button3:
-                if st.button("Tap to Hear", key=f"hear_{file_path[1]}"):
-                    # Call a hypothetical text-to-speech function (replace with actual logic)
-                    st.write(f"Playing audio for {file_path[1]}...")
-                    freq_based_ranking.text_to_speech(file_path[0])
+                if st.button("Tap to Hear", key=f"hear_{os.path.basename(file_path)}"):
+                    st.write(f"Playing audio for {os.path.basename(file_path)}...")
+                    # freq_based_ranking.text_to_speech(file_path)  # Implement your text-to-speech function
+            st.divider()

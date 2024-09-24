@@ -1,13 +1,11 @@
-import os
 from PyPDF2 import PdfFileReader
-import numpy as np
+import os
 
-def search_files(folder_paths, keyword):
-    search_results = {}
-    ranking = {}
+# Function to extract and store PDF texts in a dictionary
+def extract_pdf_text(folder_paths):
+    pdf_texts = {}
     
     for folder_path in folder_paths:
-        results = []
         for root, dirs, files in os.walk(folder_path):
             for file in files:
                 if file.endswith(".pdf"):
@@ -15,60 +13,33 @@ def search_files(folder_paths, keyword):
                     try:
                         with open(file_path, "rb") as f:
                             pdf = PdfFileReader(f)
-                            frequency = 0
+                            text = ""
                             for page_num in range(pdf.getNumPages()):
                                 page = pdf.getPage(page_num)
-                                page_text = page.extractText()
-                                
-                                # Count occurrences of the keyword
-                                if page_text and keyword.lower() in page_text.lower():
-                                    frequency += page_text.lower().count(keyword.lower())
-                                    results.append((file_path, file, page_num + 1))
-                            ranking[(file_path, file, page_num + 1)] = frequency
+                                text += page.extractText()
+
+                            # Store the file's text in the dictionary
+                            pdf_texts[file_path] = text
+
                     except Exception as e:
                         print(f"Error reading {file_path}: {e}")
 
-        if results:
-            search_results[folder_path] = results
-    print(search_results)
+    return pdf_texts
+
+
+# Function to search for keywords in the pre-extracted text dictionary
+def search_in_pdf_texts(pdf_texts, keyword):
+    search_results = {}
+    ranking = {}
+    
+    for file_path, text in pdf_texts.items():
+        frequency = text.lower().count(keyword.lower())
+        
+        if frequency > 0:
+            search_results[file_path] = frequency
+
+    if search_results:
+        # Sort the results by frequency in descending order
+        ranking = {k: v for k, v in sorted(search_results.items(), key=lambda item: item[1], reverse=True)}
+    
     return ranking
-
-def open_file(file_path):
-    os.startfile(file_path)
-
-
-
-r"""
-# Specify the folder paths where your PDF documents are located
-folder_paths = [r"C:\Users\RAMKUMAR K\Desktop\S5-MiniProject\test"]
-
-# The keyword to search for in the PDF files
-keyword = "virus"
-search_results = search_files(folder_paths, keyword)
-
-print("Search Results (Frequency):", search_results)
-
-# Prepare ranking based on frequency of keyword occurrences
-keys = list(search_results.keys())
-values = list(search_results.values())
-
-# Handle cases where no results were found
-if values:
-    sorted_value_index = np.argsort(values)
-    ranked_results = {keys[i]: values[i] for i in sorted_value_index[::-1]}
-    print(f"\nRanked Results:\n{ranked_results}")
-else:
-    print("No results found.")
-"""
-# Uncomment below to print details about found results
-"""
-if len(search_results) > 0:
-    for folder_path, results in search_results.items():
-        print(f"Folder: {folder_path}")
-        for result in results:
-            file_path, file_name, page_num = result
-            print(f"Found in File: {file_name}, Page: {page_num}")
-            # open_file(file_path)
-else:
-    print("No results found.")
-"""
