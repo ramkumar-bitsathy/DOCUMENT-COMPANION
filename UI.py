@@ -1,14 +1,13 @@
 import streamlit as st
 import freq_based_ranking
 import summariser
-import webbrowser  # Import webbrowser to open the file
-import webbrowser
 import os
+import webbrowser
+from audio import audio, stop_audio  # Importing TTS functions from audio.py
 
-st.title("PDF Keyword Search Tool")
+st.title("PDF Keyword Search and Text-to-Speech Tool")
 
 # Step 1: Text Extraction
-
 # Text input for folder path
 folder_path = st.text_input("Enter the folder path containing PDF documents:")
 
@@ -23,7 +22,6 @@ if st.button('Process PDFs'):
     if folder_path:
         folder_paths = [folder_path]
         with st.spinner("Extracting text from PDFs..."):
-            # Extract the text from PDFs
             pdf_texts = freq_based_ranking.extract_pdf_text(folder_paths)
             st.session_state["pdf_texts"] = pdf_texts
             st.success("Text extraction completed!")
@@ -31,7 +29,6 @@ if st.button('Process PDFs'):
         st.error("Please enter a valid folder path.")
 
 # Step 2: Keyword Search
-
 # Text input for keyword
 keyword = st.text_input("Enter the keyword to search for:")
 
@@ -49,61 +46,56 @@ if st.button('Submit'):
     else:
         st.error("Please process PDFs and enter a keyword before searching.")
 
-# Step 3: Display Results
-
-# If we have search results, display them
+# Step 3: Display Results and Integrate Text-to-Speech
 if st.session_state["search_results"]:
     ranked_results = st.session_state["search_results"]
 
-    print(ranked_results)
-
-    # Display each result with a button to open the corresponding PDF
     count = 0
     for file_path, score in ranked_results.items():
-        count+=1
+        count += 1
         if score > 0:
-            # Create two columns, one for the text and one for the progress bar
+            # Display file name and occurrence count
             col1, col2 = st.columns([3, 1])
 
             with col1:
-                # Show the file name and occurrence count
                 st.write(f"**{os.path.basename(file_path)}** - Occurrences: {score}")
             
             with col2:
-                # Display a progress bar for keyword occurrence
                 max_score = max(ranked_results.values())
                 st.progress(min(100, int((score / max_score) * 100)))
 
-            # Create buttons: Open File, Summarize, Tap to Hear
+            # Create buttons for "Open File", "Summarize", "Tap to Hear"
             col_button1, col_button2, col_button3 = st.columns([1, 1, 1])
 
             # Open File button
             with col_button1:
-                if st.button(f"Open File: {os.path.basename(file_path)}", key=f"open_{count}"):
-                    print(f"Trying open:{file_path}")
-                    freq_based_ranking.open_file(file_path)
+                if st.button(f"Open File", key=f"open_{count}"):
+                    if os.path.exists(file_path):
+                        webbrowser.open('file://' + os.path.realpath(file_path))
+                    else:
+                        st.error(f"File {file_path} not found.")
 
-            # Summarize button (placeholder for your summarizer function)
+            # Summarize button
             summary = None
             with col_button2:
                 if st.button("Summarize", key=f"summarize_{count}"):
-                    # Call a hypothetical summarize function (replace with actual logic)
-                    #st.write(f"Summarizing content from {file_path[1]}...")
+                    summary = summariser.summarize_file(st.session_state["pdf_texts"][file_path])
+                    st.write("Summarizing...")
 
-                    #st.write(st.session_state["pdf_texts"][file_path])
-                    summary = summariser.summarize_file(st.session_state["pdf_texts"][file_path][0])
-                    st.write("Sumarizing...")
-    
-
-            # Tap to Hear button (placeholder for your text-to-speech function)
+            # Tap to Hear button (Text-to-Speech functionality)
             with col_button3:
                 if st.button("Tap to Hear", key=f"hear_{count}"):
-                    # Call a hypothetical text-to-speech function (replace with actual logic)
-                    st.write(f"Playing audio for {file_path[1]}...")
-                    #freq_based_ranking.text_to_speech(file_path[0])
+                    # Call the TTS function from audio.py
+                    audio(st.session_state["pdf_texts"][file_path])
+
+            # Stop button for the speech
+            if st.button("Stop", key=f"stop_{count}"):
+                stop_audio()
+
+            # Display the summary (if any)
             if summary:
                 with st.expander(f"Summary of {os.path.basename(file_path)}"):
                     st.write(summary)
 
-        
             st.divider()
+
