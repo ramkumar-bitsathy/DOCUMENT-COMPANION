@@ -1,6 +1,7 @@
 import streamlit as st
 from summarizer import Summarizer
 def summarize_file(body):
+    
     model = Summarizer()
     
     if body:

@@ -1,6 +1,10 @@
 from PyPDF2 import PdfFileReader
 import os
 
+import section_analysis
+def open_file(file_path):
+    print("AAAAAAAAAAAAAAAAAAAA")
+    os.startfile(file_path)
 # Function to extract and store PDF texts in a dictionary
 def extract_pdf_text(folder_paths):
     pdf_texts = {}
@@ -20,7 +24,7 @@ def extract_pdf_text(folder_paths):
                                 text += page.extractText()
 
                             # Store the file's text in the dictionary
-                            pdf_texts[file_path] = text
+                            pdf_texts[file_path] = list([text, section_analysis.section_analysis(text)])
 
                     except Exception as e:
                         print(f"Error reading {file_path}: {e}")
@@ -34,7 +38,7 @@ def search_in_pdf_texts(pdf_texts, keyword):
     ranking = {}
     
     for file_path, text in pdf_texts.items():
-        frequency = text.lower().count(keyword.lower())
+        frequency = text[0].lower().count(keyword.lower())
         
         if frequency > 0:
             search_results[file_path] = frequency

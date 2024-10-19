@@ -55,6 +55,8 @@ if st.button('Submit'):
 if st.session_state["search_results"]:
     ranked_results = st.session_state["search_results"]
 
+    print(ranked_results)
+
     # Display each result with a button to open the corresponding PDF
     count = 0
     for file_path, score in ranked_results.items():
@@ -77,11 +79,9 @@ if st.session_state["search_results"]:
 
             # Open File button
             with col_button1:
-                if st.button(f"Open File", key=f"open_{count}"):
-                    if os.path.exists(file_path):
-                        webbrowser.open('file://' + os.path.realpath(file_path))
-                    else:
-                        st.error(f"File {file_path} not found.")
+                if st.button(f"Open File: {os.path.basename(file_path)}", key=f"open_{count}"):
+                    print(f"Trying open:{file_path}")
+                    freq_based_ranking.open_file(file_path)
 
             # Summarize button (placeholder for your summarizer function)
             summary = None
@@ -91,7 +91,7 @@ if st.session_state["search_results"]:
                     #st.write(f"Summarizing content from {file_path[1]}...")
 
                     #st.write(st.session_state["pdf_texts"][file_path])
-                    summary = summariser.summarize_file(st.session_state["pdf_texts"][file_path])
+                    summary = summariser.summarize_file(st.session_state["pdf_texts"][file_path][0])
                     st.write("Sumarizing...")
     
 
