@@ -3,7 +3,7 @@ import freq_based_ranking
 import summariser
 import os
 import webbrowser
-from audio import audio, stop_audio  # Importing TTS functions from audio.py
+from audio import audio, stop_audio  
 
 st.title("PDF Keyword Search and Text-to-Speech Tool")
 
