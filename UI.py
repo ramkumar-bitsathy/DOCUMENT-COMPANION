@@ -6,6 +6,14 @@ import shutil
 import atexit  # To handle cleanup at the end of the program
 from audio import audio, stop_audio  
 
+def dict_to_string(dictionary):
+    string = ""
+    for key in dictionary:
+        string += key+ " " +dictionary[key]
+    return string
+
+
+
 # Create temp_audio directory if it doesn't exist
 if not os.path.exists('temp_audio'):
     os.makedirs('temp_audio')
@@ -83,7 +91,7 @@ if st.session_state["search_results"]:
                 if st.button("Summarize", key=f"summarize_{count}"):
                     # Check if the summary already exists in session_state
                     if file_path not in st.session_state["summaries"]:
-                        summary = summariser.summarize_file(st.session_state["pdf_texts"][file_path][0])
+                        summary = summariser.summarize_file(st.session_state["pdf_texts"][file_path][1])
                         st.session_state["summaries"][file_path] = summary
                     else:
                         summary = st.session_state["summaries"][file_path]
@@ -91,14 +99,21 @@ if st.session_state["search_results"]:
             # Display the summary (if any) in an expander
             if file_path in st.session_state["summaries"]:
                 with st.expander(f"Summary of {os.path.basename(file_path)}", expanded=True):
-                    st.write(st.session_state["summaries"][file_path])
+                    if type(st.session_state["summaries"][file_path]) == str:
+                        st.write(st.session_state["summaries"][file_path])
+                    elif type(st.session_state["summaries"][file_path]) == dict:
+                        for section,summarised_content in (st.session_state["summaries"][file_path]).items():
+                            st.subheader(section)
+                            st.write(summarised_content)
 
-                    # Immediately generate and play the audio after summarizing
-                    audio_file_path = os.path.join('temp_audio', f"summary_audio_{count}.wav")
-                    # Generate audio for the summarized content
-                    audio(st.session_state["summaries"][file_path], audio_file_path)
-                    # Store the audio path in session_state
-                    st.session_state["audio_paths"][file_path] = audio_file_path
+                    # Add Tap to Hear button within the expander for summarized content
+                    if st.button("Tap to Hear", key=f"hear_summary_{count}"):
+                        # Create a unique path for the audio file in a temporary directory
+                        audio_file_path = os.path.join('temp_audio', f"summary_audio_{count}.wav")
+                        # Generate audio for the summarized content
+                        audio(dict_to_string(st.session_state["summaries"][file_path]), audio_file_path)
+                        # Store the audio path in session_state
+                        st.session_state["audio_paths"][file_path] = audio_file_path
 
                     # Display audio player immediately after audio generation
                     if os.path.exists(audio_file_path):
