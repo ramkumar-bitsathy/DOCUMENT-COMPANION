@@ -93,22 +93,18 @@ if st.session_state["search_results"]:
                 with st.expander(f"Summary of {os.path.basename(file_path)}", expanded=True):
                     st.write(st.session_state["summaries"][file_path])
 
-                    # Add Tap to Hear button within the expander for summarized content
-                    if st.button("Tap to Hear", key=f"hear_summary_{count}"):
-                        # Create a unique path for the audio file in a temporary directory
-                        audio_file_path = os.path.join('temp_audio', f"summary_audio_{count}.wav")
-                        # Generate audio for the summarized content
-                        audio(st.session_state["summaries"][file_path], audio_file_path)
-                        # Store the audio path in session_state
-                        st.session_state["audio_paths"][file_path] = audio_file_path
+                    # Immediately generate and play the audio after summarizing
+                    audio_file_path = os.path.join('temp_audio', f"summary_audio_{count}.wav")
+                    # Generate audio for the summarized content
+                    audio(st.session_state["summaries"][file_path], audio_file_path)
+                    # Store the audio path in session_state
+                    st.session_state["audio_paths"][file_path] = audio_file_path
 
-                    # Display audio player if the file was generated
-                    if file_path in st.session_state["audio_paths"]:
-                        audio_path = st.session_state["audio_paths"][file_path]
-                        if os.path.exists(audio_path):
-                            st.audio(audio_path)
-                        else:
-                            st.error(f"Audio file not found: {audio_path}")
+                    # Display audio player immediately after audio generation
+                    if os.path.exists(audio_file_path):
+                        st.audio(audio_file_path)
+                    else:
+                        st.error(f"Audio file not found: {audio_file_path}")
 
             st.divider()
 

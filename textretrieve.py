@@ -15,8 +15,10 @@ def search_files(folder_paths, keyword):
                         for page_num in range(pdf.getNumPages()):
                             page = pdf.getPage(page_num)
                             page_text = page.extractText()
+                            
                             if keyword.lower() in page_text.lower():
                                 results.append((file_path, file, page_num + 1))
+                                print(result)
 
         if results:
             search_results[folder_path] = results

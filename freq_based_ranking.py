@@ -1,11 +1,17 @@
 from PyPDF2 import PdfFileReader
 import os
+import sys
+import subprocess
 
 import section_analysis
 def open_file(file_path):
-    print("AAAAAAAAAAAAAAAAAAAA")
-    os.startfile(file_path)
-# Function to extract and store PDF texts in a dictionary
+    if sys.platform == "win32":
+        os.startfile(file_path)  # Windows
+    elif sys.platform == "darwin":
+        subprocess.call(["open", file_path])  # macOS
+    else:
+        subprocess.call(["xdg-open", file_path])  # Linux
+  
 def extract_pdf_text(folder_paths):
     pdf_texts = {}
     

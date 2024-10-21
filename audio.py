@@ -6,7 +6,7 @@ import os
 engine = pyttsx3.init()
 
 # Set properties like volume and speaking rate
-engine.setProperty('rate', 250)  # Speed of speech
+engine.setProperty('rate', 100)  # Speed of speech
 engine.setProperty('volume', 1)  # Volume level (0.0 to 1.0)
 
 # Function to convert text to speech and save it as a .wav file
