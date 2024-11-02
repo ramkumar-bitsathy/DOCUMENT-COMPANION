@@ -91,7 +91,8 @@ if st.session_state["search_results"]:
                 if st.button("Summarize", key=f"summarize_{count}"):
                     # Check if the summary already exists in session_state
                     if file_path not in st.session_state["summaries"]:
-                        summary = summariser.summarize_file(st.session_state["pdf_texts"][file_path][1])
+                        summary = summariser.summarize_file(st.session_state["pdf_texts"][file_path][0])
+                        summary = summariser.summarize_file(st.session_state["pdf_texts"][file_path][0])
                         st.session_state["summaries"][file_path] = summary
                     else:
                         summary = st.session_state["summaries"][file_path]
@@ -111,15 +112,20 @@ if st.session_state["search_results"]:
                         # Create a unique path for the audio file in a temporary directory
                         audio_file_path = os.path.join('temp_audio', f"summary_audio_{count}.wav")
                         # Generate audio for the summarized content
-                        audio(dict_to_string(st.session_state["summaries"][file_path]), audio_file_path)
+                        if type(st.session_state["summaries"][file_path])==dict:
+                            audio(dict_to_string(st.session_state["summaries"][file_path]), audio_file_path)
+                        elif type(st.session_state["summaries"][file_path]) == str:
+                            audio(st.session_state["summaries"][file_path], audio_file_path)
                         # Store the audio path in session_state
                         st.session_state["audio_paths"][file_path] = audio_file_path
 
-                    # Display audio player immediately after audio generation
-                    if os.path.exists(audio_file_path):
-                        st.audio(audio_file_path)
-                    else:
-                        st.error(f"Audio file not found: {audio_file_path}")
+                    # Display audio player if the file was generated
+                    if file_path in st.session_state["audio_paths"]:
+                        audio_path = st.session_state["audio_paths"][file_path]
+                        if os.path.exists(audio_path):
+                            st.audio(audio_path)
+                        else:
+                            st.error(f"Audio file not found: {audio_path}")
 
             st.divider()
 
