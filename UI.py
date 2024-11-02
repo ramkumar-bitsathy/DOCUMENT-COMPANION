@@ -91,8 +91,7 @@ if st.session_state["search_results"]:
                 if st.button("Summarize", key=f"summarize_{count}"):
                     # Check if the summary already exists in session_state
                     if file_path not in st.session_state["summaries"]:
-                        summary = summariser.summarize_file(st.session_state["pdf_texts"][file_path][0])
-                        summary = summariser.summarize_file(st.session_state["pdf_texts"][file_path][0])
+                        summary = summariser.summarize_file(st.session_state["pdf_texts"][file_path][1])
                         st.session_state["summaries"][file_path] = summary
                     else:
                         summary = st.session_state["summaries"][file_path]
