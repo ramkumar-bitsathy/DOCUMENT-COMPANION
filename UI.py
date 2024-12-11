@@ -111,10 +111,7 @@ if st.session_state["search_results"]:
                         # Create a unique path for the audio file in a temporary directory
                         audio_file_path = os.path.join('temp_audio', f"summary_audio_{count}.wav")
                         # Generate audio for the summarized content
-                        if type(st.session_state["summaries"][file_path])==dict:
-                            audio(dict_to_string(st.session_state["summaries"][file_path]), audio_file_path)
-                        elif type(st.session_state["summaries"][file_path]) == str:
-                            audio(st.session_state["summaries"][file_path], audio_file_path)
+                        audio(st.session_state["summaries"][file_path], audio_file_path)
                         # Store the audio path in session_state
                         st.session_state["audio_paths"][file_path] = audio_file_path
 
